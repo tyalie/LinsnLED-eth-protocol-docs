@@ -1,0 +1,13 @@
+extends: default
+font:
+  catalog:
+    merge: true
+    B612:
+      normal: B612-Regular.ttf
+      bold: B612-Bold.ttf
+      italic: B612-Italic.ttf
+      bold_italic: B612-BoldItalic.ttf
+base:
+  font-family: B612
+quote:
+  font-size: 1em
