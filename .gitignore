@@ -1,0 +1,3 @@
+.asciidoctor
+build/
+resources/images/*-md5-*
