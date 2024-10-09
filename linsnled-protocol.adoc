@@ -3,8 +3,9 @@ Sophie Tyalie <dev@flowerpot.me>
 :reproducible:
 :description: The document's description.
 :title-page:
+:doctype: book
+:sectnums:
 :revnumber: 0.0.1
-:pdf-page-size: A4
 :toc:
 
 WARNING: This work is not affiliated with LinsnLED, nor does it claim to fully describe

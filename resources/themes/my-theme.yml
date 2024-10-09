@@ -11,3 +11,5 @@ base:
   font-family: B612
 quote:
   font-size: 1em
+heading:
+  font-family: Helvetica
