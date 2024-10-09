@@ -1,0 +1,95 @@
+== Introduction
+
+LED matrix displays are everywhere nowadays. From small 24/7 kiosks that show
+that they are open using monochrome LED panels to big advertisement screens in
+NY Time Square, London Piccadilly or even high-end cinemas with full color, high
+dynamic range images. To support such large installations, the hardware itself
+has become relatively cheap. With just 15€ (+ shipping from China) one can get
+their own 64x64 (~0.3ct per LED) / 20 x 20 cm LED panel. This remarkable price is
+reached by outsourcing the display logic onto an external module, making the
+panel itself just some power wiring and an assortment of shift-registers.
+
+Due to their high availability, simple electrical design and low cost of entry
+(and tbqh 'cuz they are just very cool), there have been many attempts at
+controlling these using a diverse range of hardware. Some notable ones:
+
+:fn-adafruit-arduino: footnote:[https://github.com/adafruit/RGB-matrix-Panel]
+:fn-hzeller-rgb: footnote:[https://github.com/hzeller/rpi-rgb-led-matrix]
+:fn-adafruit-fpga: footnote:[https://learn.adafruit.com/fpga-rgb-matrix/overview]
+
+[cols="1,2"]
+|===
+
+|Adafruit's RGB Matrix Panel lib{fn-adafruit-arduino}
+|Controls a HUB75 style RGB matrix using and the GPIO pins of an Arduino. They
+also have a newer one, for the newer Arduino models. This is compatible with
+the LED matrix they sell
+
+|HZeller's RPi RGB LED Matrix{fn-hzeller-rgb}
+|Using the RPi GPIO and some clever tricks with its hardware PWM, they actually
+archive driving compatible panels with full rgb and 30fps.
+
+|Adafruit's FPGA LED matrix tutorial{fn-adafruit-fpga}
+|An honorable mention, because FPGAs are the way the professionals do it - but more on
+that later.
+|===
+
+And these are just the projects by big organizations or that are often
+recommended. Just searching for the term "LED Matrix" on GitHub.com presents us
+with 6.7k results, so the general interest is quite high.
+
+But almost all open source projects do not take full advantage of the
+(honestly) dumb piece of PCB they control. Due to the fact, that every driving
+logic resides outside the panels, using the right controller can be the
+difference between a monochrome RGB display with ~1 FPS refresh rate, or a
+12bit HDR 120fps display using the exact same LED panel. So it's only natural,
+that professionals do not use their custom controller solution, but instead
+employ a proven off the shelf solution. And here comes our company into the
+larger picture: LinsnLED.
+
+:fn-q3k-led: footnote:[Using a receiver as a dev platform: https://github.com/q3k/chubby75]
+
+LinsnLED is one of the more well known companies which design, program and
+produce controller modules for the aforementioned LED panels. Their so-called
+receiver modules (aka receives images and controls LED panels) can be driven
+over a simple Ethernet cable and are fairly cheap at around 15€ per piece on
+AliExpress. There are many reasons why they are cool. Starting with the fact
+that they were one of the cheaper FPGA dev platforms{fn-q3k-led} out there, when
+FPGAs weren't really in reach yet for tinkerers around the globe. Over the fact
+that a single one can sometimes drive even large installations (720p), expanding
+on that ability by simply adding more receivers. To the reason why they have
+been chosen for this reverse engineering project: They are highly configurable
+and as such compatible with almost every LED panel out there.
+
+Sadly there is no open source driver available so far, but only Linsn's Windows
+based application or their controller modules that accept HDMI, DVI or VGA
+input. Luckily for us there is not a lot of magic behind it, meaning that even a
+single RPi might be able to render to a large LED screen in the future. But to
+do this we first need to understand the protocol they use, which is the focus of
+this document.
+
+=== Previous Research
+
+The protocol has been explored multiple times in the past, but so far without
+great success.
+
+:fn-mikrokontroller: footnote:[https://www.mikrocontroller.net/topic/352894]
+:fn-eevblog: footnote:[https://www.eevblog.com/forum/projects/reverse-engineering-a-chinese-led-screen-control-thing-interesting!/50/]
+:fn-chubby75-rv908: footnote:[https://github.com/q3k/chubby75/issues/20]
+
+A simple replay "attack" has been done by Frank E. from
+mikrokontroller.net{fn-mikrokontroller}, demonstrating the stateless property of
+the protocol and the initial feasibility of controlling the Linsn RV908 modules
+through a simple Ethernet port.
+
+In an eevblog forum thread{fn-eevblog} some users explored the serial protocol
+to control the controller / sender card, which can be connected to a receiver.
+Even though this is raw serial, it is relevant in the Ethernet protocol, as can
+be seen later on. Sadly the research stopped with many questions still
+unanswered.
+
+The hardware of our receiver module was documented by chubby, although there
+seem to be multiple revisions of the same module out there. Ours does not have a
+separate RAM module on board and uses a different FPGA.{fn-chubby75-rv908}
+
+

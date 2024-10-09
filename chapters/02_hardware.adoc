@@ -1,0 +1,91 @@
+== The hardware
+
+:fn-chubby75-rv901: footnote:[https://github.com/q3k/chubby75/blob/master/rv901t/README.md]
+:fn-chubby75-rv901-hardware: footnote:[https://github.com/q3k/chubby75/blob/master/rv901t/doc/hardware.md]
+
+The research was done using a modern RV908M32 receiver module by LinsnLED. It
+has 12 HUB75 outputs, with each being able to control a chain of panels (the
+exact amount depends on a few factors). The processing is done by an Analogic FPGA.
+Overall a single RV908M32 can control up to 1024 x 256 pixels at 12bit HDR and
+variable FPS. The communication happens over a single 1G Ethernet cable. The
+board itself is driven over 5V input, but is not responsible for providing power
+the panels themselves. They seem to have the ability to measure the power usage
+of the panels, but this has not been verified nor tested.
+
+NOTE: After looking into the protocol we are mostly sure, that the
+protocol does not change between receiver revisions and as such is fully
+backwards compatible. Of course hardware limits of the respective receivers
+apply.
+
+=== SPI
+
+An interesting feature of the RV908M32 and RV901{fn-chubby75-rv901} is the
+existence of an SPI attached flash on the board. Luckily Linsn has not removed
+nor destroyed the SPI programming header which allowed us to read the FPGA
+bitstream. The SPI flash can be accessed the following way (from
+Chubby75{fn-chubby75-rv901-hardware}).
+
+[quote,Chubby75 RV901 hardware description]
+____
+The SPI flash holding the configuration memory (U2) is accessible via JP5. The
+flash I/Os are unbuffered 3.3V, connected through 33Ω resistors. The PROG_B
+signal has to be pulled LOW to GND [without a resistor] in order to access
+the SPI flash.
+____
+
+.SPI Programming header pinout - adapted from Chubby75{fn-chubby75-rv901-hardware}
+[cols="6*^"]
+|===
+|Shared|SPI Pin|Header Pin|Header Pin|SPI Pin|Shared
+
+|CLK  |CLK  | 1|2 |     |
+|MISO |DO   | 3|4 |     |5V
+|     |     | 5|6 |     |PROG_B
+|CS   |CS   | 7|8 |     |
+|MOSI |DI   | 9|10|GND  |GND
+|===
+
+Interestingly all non-volatile configuration is also stored here, meaning that
+in a large scale system it is plausible to recover and restore the configuration
+by using the header. This might be useful in cases, where the board does not
+respond anymore due to misconfiguration, so it is recommended to backup up the
+data stored there before exploring the hardware.
+
+=== Ethernet
+
+:fn-mae0621b: footnote:[http://www.maxio-tech.com/product/12928/12929/12930/13005.html]
+
+Our board uses a Chinese produced 1000BASE-T Ethernet chip called Maxio
+MAE0621B{fn-mae0621b}. Contrary to statements made by Linsn, the chip supports
+MDI-X, meaning that no Ethernet crossover cable is required. It is otherwise a
+fairly normal 1000BASE-T Ethernet chip, that supports most common features one
+would expect.
+
+=== FPGA
+
+:fn-prjtang: footnote:[https://github.com/mmicko/prjtang/blob/master/docs/architecture/bitstream_format.rst]
+
+As mentioned before we were able to read the FPGA bitstream from the flash.
+Without going into much detail here, we found that our revision of the RV908M32
+uses an Anlogic EG4S20BG256. This is in contrast to the Xilinx based FPGA they
+used as late as 2020. We figured this out, by using the bitstream format
+description for Anlogic FPGAs by the mmicko/prjtang project{fn-prjtang}. With
+this change Linsn was able to remove the external DRAM from the board, as the
+Anlogic FPGAs have one already integrated, presumably reducing the manufacturing
+cost.
+
+It is known through the Chubby75 project{fn-chubby75-rv908}, that it can be
+accessed using exposed JTAG contacts. There has been no further research into
+the FPGA itself as this is not the focus of this project.
+
+=== The LED panel
+
+:fn-tang-nano: footnote:[WayBack because they broke their images: https://web.archive.org/web/20240422085913/https://learn.lushaylabs.com/led-panel-hub75/]
+
+The LED panels we used here are standard HUB75 RGB LED panels. There have been
+numerous description on their inner workings before. See for example C. Klüser's
+extensive post on Lushay Labs using a Tang Nano FPGA{fn-tang-nano} to control
+these panels. For this project we used a few very different panels lying around
+to explore the receiver and had great success with all of them.
+
+
