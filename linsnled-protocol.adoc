@@ -6,7 +6,7 @@ Sophie Tyalie <dev@flowerpot.me>
 :xrefstyle: short
 :doctype: book
 :sectnums:
-:revnumber: 0.0.1
+:revnumber: 0.1.0
 :chapdir: chapters
 :toc:
 :toclevels: 5
