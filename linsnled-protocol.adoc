@@ -3,6 +3,7 @@ Sophie Tyalie <dev@flowerpot.me>
 :reproducible:
 :description: The document's description.
 :title-page:
+:xrefstyle: short
 :doctype: book
 :sectnums:
 :revnumber: 0.0.1
@@ -10,6 +11,9 @@ Sophie Tyalie <dev@flowerpot.me>
 :toc:
 :toclevels: 5
 :stem: latexmath
+
+[%notitle]
+== Preface
 
 WARNING: This work is not affiliated with LinsnLED, nor does it claim to fully describe
 the protocol. The purpose of the documentation here is to make the
