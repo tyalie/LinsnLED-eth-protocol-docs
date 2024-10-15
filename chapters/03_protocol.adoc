@@ -45,6 +45,8 @@ for more details.
 |`0xaa56`|1482 bytes|Receiver -> Sender
 |===
 
+NOTE: EtherType is described as big endian.
+
 We will be using here Ethernet II (DIX 2.0) frames in the format described by
 <<ethernet-ii-packet>>. Preample and CRC can generally be ignored, as they are
 automatically generated and stripped by the network hardware. If these two would
@@ -89,11 +91,12 @@ response dynamic at the start of the transfer, further described in
 
 === LinsnLED Ethernet payload
 
-This is where much of the real magic happens. Generally the payload can be split
-into a *32 byte header* and remainder. For packets of EtherType `0xaa55` the
-remainder is *1440 bytes of frame buffer data* (see <<frame-buffer-data>>).
-Whereas the current assumption is, that packets of EtherType `0xaa56` do not
-make use of the 1450 byte long remainder segment (TBD).
+This is where much of the real magic happens. Generally the Ethernet payload of
+a single Ethernet packet can be split into a *32 byte header* and remainder. For
+packets of EtherType `0xaa55` the remainder is *1440 bytes of frame buffer data*
+(see <<frame-buffer-data>>). Whereas the current assumption is, that packets of
+EtherType `0xaa56` do not make use of the 1450 byte long remainder segment
+(TBD).
 
 CAUTION: *TODO* For EtherType `0xaa56` only packets of type Mac discovery
 (<<cmd-mac-discovery>>) have been discovered. There might be other messages from the
@@ -125,15 +128,17 @@ endian if not mentioned otherwise.
 (draw-related-boxes (repeat 4 0))
 (draw-box "Cmd" {:span 1})
 (draw-box nil [{:span 7} :box-above])
-(draw-box "Command data" [{:span 15} :box-below])
+(draw-box "Command data (22 bytes)" [{:span 15} :box-below])
 (draw-box "Chks")
 ----
 
 ==== Fields
 [[header-field-pkgid]]
 ===== Package ID
-This is a 4 byte LE unsigned number. For EtherType `0xaa55` it starts at zero
-for the first chunk of each frame and increments by one for each following chunk.
+This is a 4 byte LE unsigned number. For EtherType `0xaa55` it is directly tied
+with the frame buffer data of the same package (see <<frame-buffer-data>>). A
+frame is split into chunks and the package ID starts at zero for the first such
+chunk and increments by one for each following chunk.
 
 For EtherType `0xaa56` it has a different meaning during MAC discovery (see
 <<cmd-mac-discovery>>).
@@ -203,7 +208,7 @@ CAUTION: *TODO* There are a lot of unknowns about this part currently,
 especially how it is configured / announced to the receiver what the exact data
 layout is. As mentioned above 24 bit GBR has been observed, but it is known that
 our receiver is theoretically capable of 12 bit HDR and that other channel
-orders might be possible. Correctly there is no information available how this
+orders might be possible. Currently there is no information available how this
 would present itself in the data.
 
 .Schematic example data chunk for frame buffer including LinsnLED header using zero command
@@ -212,10 +217,11 @@ would present itself in the data.
 (draw-column-headers)
 (draw-box "Package ID" {:span 4})
 (draw-padding 32)
-(draw-related-boxes (map #(text % :hex) ["GG" "BB" "RR"]))
-(draw-related-boxes (map #(text % :hex) ["GG" "BB" "RR"]))
-(draw-related-boxes (map #(text % :hex) ["GG" "BB" "RR"]))
-(draw-related-boxes (map #(text % :hex) ["GG" "BB" "RR"]))
+(doseq [val (range 5)]
+  (draw-box (text "GG" :hex) [:box-first {:fill "#CCFFCC"}])
+  (draw-box (text "BB" :hex) [:box-related {:fill "#CCCCFF"}])
+  (draw-box (text "RR" :hex) [:box-last {:fill "#FFCCCC"}])
+)
 (draw-box "..." {:borders nil})
 ----
 
@@ -264,12 +270,14 @@ process.
 
 The answer by the receiver is very different. It still adheres to the general
 header data layout as described in <<header>>, but the *meaning of the packet ID
-field changes* a bit.
+field changes* a bit. The command byte is zero.
 
 As the observed value so far is relatively high, it could describe the maximum
 supported package ID, the maximum buffer storage capacity, …. TBD
 
-The remainder segment seems to be irrelevant.
+The remainder segment seems to be irrelevant in this case.
+
+CAUTION: *TODO* Unknown what the packet ID field does in this case.
 
 [[cmd-configuration]]
 === Configuring the system
