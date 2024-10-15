@@ -204,12 +204,13 @@ according to the xref:header-field-pkgid[package ID attribute] in the header,
 whereby a 1440 byte long chunk starts at offset `1440 byte * segment-number` in
 the final frame.
 
-The image generally has the form of 1024 * 512 px and can be split into 512 *
-512 px sub-images (left and right). Left always seems to contain an image,
-whereas the right side has been observed with and without an image. No image
-here means that it was filled with zeros. Interestingly the first image row was
-always filled with zeros so far, the purpose of that is unknown. The only
-observed encoding was uncompressed 24 bit GBR (green/blue/red) data.
+The transferred image generally has the form of 1024 * 512 px and can (for
+interpretation) be split into 512 * 512 px sub-images (left and right). Left
+always seems to contain an image, whereas the right side has been observed with
+and without an image. No image here means that it was filled with zeros.
+Interestingly the first image row was always filled with zeros so far, the
+purpose of that is unknown. The only observed encoding was uncompressed 24 bit
+GBR (green/blue/red) data.
 
 CAUTION: *TODO* There are a lot of unknowns about this part currently,
 especially how it is configured / announced to the receiver what the exact data
@@ -241,12 +242,17 @@ During a usual protocol cycle there are two places where this command type is
 being used. LinsnLED sender applications use it *during the "initialization"
 phase* to discover the MAC addresses of all attached receiver modules. Later on
 this command is employed *to mark the start of a new frame*. The receiver always
-answers (described in <<cmd-mac-discovery-recv>>).
+answers in ideal circumstances (described in <<cmd-mac-discovery-recv>>).
+
+NOTE: The protocol is stateless, so there is no *initialization phase* in the
+strict sense. Still the controllers need to discover all modules in order to
+address them, which is meant here as "initialization" phase.
 
 The biggest difference between these two use-cases is the receiver MAC address.
-For the general discovery of receivers the packet is broadcast, whereas later on
-it is addressed at a specific module. For the broadcasted packages the content
-of the remainder / frame buffer data seems to be irrelevant.
+For the general discovery of receivers the Ethernet destination is broadcast,
+whereas later on (to mark a new frame) it is addressed at a specific module. For
+broadcasted packages the content of the remainder / frame buffer data seems to
+be irrelevant.
 
 ==== Data layout
 
