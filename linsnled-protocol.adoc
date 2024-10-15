@@ -8,6 +8,8 @@ Sophie Tyalie <dev@flowerpot.me>
 :revnumber: 0.0.1
 :chapdir: chapters
 :toc:
+:toclevels: 5
+:stem: latexmath
 
 WARNING: This work is not affiliated with LinsnLED, nor does it claim to fully describe
 the protocol. The purpose of the documentation here is to make the
