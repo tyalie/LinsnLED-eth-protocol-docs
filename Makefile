@@ -3,6 +3,7 @@ pdfs := $(docs:.adoc=.pdf)
 htmls := $(docs:.adoc=.html)
 options := -r asciidoctor-diagram
 options-pdf := -a imagesdir=resources/images-pdf \
+	-a bytefield-svg=./bytefield-with-prefix.sh \
 	-r asciidoctor-mathematical -a mathematical-format=svg \
 	-a pdf-themesdir=resources/themes -a pdf-theme=my-theme.yml \
 	-a pdf-fontsdir=resources/fonts \
