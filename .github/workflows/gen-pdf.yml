@@ -39,6 +39,9 @@ jobs:
           name: PDF file
           path: ghbuild/linsnled-protocol.pdf
           retention-days: 5
+      - name: Remove nightly tag before recreating it
+        run:
+          gh release delete nightly --yes
       - name: Create nightly release
         uses: softprops/action-gh-release@v2
         with:
