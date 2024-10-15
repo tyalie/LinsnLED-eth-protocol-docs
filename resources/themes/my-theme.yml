@@ -7,9 +7,24 @@ font:
       bold: B612-Bold.ttf
       italic: B612-Italic.ttf
       bold_italic: B612-BoldItalic.ttf
+    "B612 Mono":
+      normal: B612Mono-Regular.ttf
+      bold: B612Mono-Bold.ttf
+      italic: B612Mono-Italic.ttf
+      bold_italic: B612Mono-BoldItalic.ttf
+    "League Spartan":
+      normal: "LeagueSpartan-Regular.ttf"
+      bold: "LeagueSpartan-Bold.ttf"
 base:
   font-family: B612
 quote:
   font-size: 1em
+title-page:
+  font-family: "League Spartan"
+  subtitle:
+    font-family: B612
+    font-style: italic
+  title:
+    font-size: 3em
 heading:
-  font-family: Helvetica
+  font-family: "League Spartan"
