@@ -204,13 +204,13 @@ according to the xref:header-field-pkgid[package ID attribute] in the header,
 whereby a 1440 byte long chunk starts at offset `1440 byte * segment-number` in
 the final frame.
 
-The transferred image generally has the form of 1024 * 512 px and can (for
-interpretation) be split into 512 * 512 px sub-images (left and right). Left
-always seems to contain an image, whereas the right side has been observed with
-and without an image. No image here means that it was filled with zeros.
-Interestingly the first image row was always filled with zeros so far, the
-purpose of that is unknown. The only observed encoding was uncompressed 24 bit
-GBR (green/blue/red) data.
+The transferred image generally has the form of 512 * 256 px (width x height)
+and can (for interpretation) be split into 256 * 256 px sub-images (left and
+right). Left always seems to contain an image, whereas the right side has been
+observed with and without an image. No image here means that it was filled with
+zeros. Interestingly the first image row was always filled with zeros so far,
+the purpose of that is unknown. The only observed encoding was uncompressed 24
+bit GBR (green/blue/red) data.
 
 CAUTION: *TODO* There are a lot of unknowns about this part currently,
 especially how it is configured / announced to the receiver what the exact data
