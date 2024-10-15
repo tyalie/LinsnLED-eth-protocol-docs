@@ -139,12 +139,15 @@ could be a deeper meaning.
 ==== Fields
 [[header-field-pkgid]]
 ===== Package ID
+
 This is a 4 byte LE unsigned number. For EtherType `0xaa55` it is directly tied
 with the frame buffer data of the same package (see <<frame-buffer-data>>). A
 frame is split into chunks and the package ID starts at zero for the first such
-chunk and increments by one for each following chunk.
+chunk and increments by one for each following chunk. For EtherType `0xaa56`
+(from receiver) the field has a different meaning during MAC discovery (see
+<<cmd-mac-discovery>>).
 
-For EtherType `0xaa56` it has a different meaning during MAC discovery (see
+A package ID of zero *enforces* a MAC discovery command (see
 <<cmd-mac-discovery>>).
 
 ===== Checksum (Chks)
@@ -197,7 +200,7 @@ bytes* long. So far it seems to be the only remainder type supported. (TBD)
 
 As a single frame does not fit into the 1440 byte payload, instead it is split
 up and transferred in chunks of the same size. The data is stitched together
-according to the xref:header-field-pkgid[segment number attribute] in the header,
+according to the xref:header-field-pkgid[package ID attribute] in the header,
 whereby a 1440 byte long chunk starts at offset `1440 byte * segment-number` in
 the final frame.
 
@@ -212,7 +215,7 @@ CAUTION: *TODO* There are a lot of unknowns about this part currently,
 especially how it is configured / announced to the receiver what the exact data
 layout is. As mentioned above 24 bit GBR has been observed, but it is known that
 our receiver is theoretically capable of 12 bit HDR and that other channel
-orders might be possible. Currently there is no information available how this
+orders might be possible. Currently, there is no information available how this
 would present itself in the data.
 
 .Schematic example data chunk for frame buffer including LinsnLED header using zero command
@@ -231,6 +234,8 @@ would present itself in the data.
 
 [[cmd-mac-discovery]]
 === MAC discovery
+
+This requires the command field in the header to be `0x96`.
 
 During a usual protocol cycle there are two places where this command type is
 being used. LinsnLED sender applications use it *during the "initialization"
@@ -285,6 +290,8 @@ CAUTION: *TODO* Unknown what the packet ID field does in this case.
 
 [[cmd-configuration]]
 === Configuring the system
+
+This requires the command field in the header to be `0x61`.
 
 CAUTION: This section is currently under heavy construction as it is one of the
 more complex to RE and extensive elements of the protocol.
