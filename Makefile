@@ -1,14 +1,14 @@
 docs := $(wildcard *.adoc)
 pdfs := $(docs:.adoc=.pdf)
 htmls := $(docs:.adoc=.html)
-options := -r asciidoctor-diagram
-options-pdf := -a imagesdir=resources/images-pdf \
+options := -r asciidoctor-diagram -a imagesdir=resources/images
+options-pdf :=  -a imagesoutdir=build/resources/images-pdf \
 	-a bytefield-svg=./bytefield-with-prefix.sh \
 	-r asciidoctor-mathematical -a mathematical-format=svg \
 	-a pdf-themesdir=resources/themes -a pdf-theme=my-theme.yml \
 	-a pdf-fontsdir=resources/fonts \
 	-a pdf-page-size=A4
-options-html := -a imagesdir=resources/images-html
+options-html := -a imagesoutdir=build/resources/images-html
 all: html pdf
 pdf: $(pdfs)
 html: $(htmls)

@@ -1,4 +1,2 @@
 .asciidoctor
 build/
-resources/images/*-md5-*
-resources/images/stem-*
