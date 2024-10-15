@@ -43,7 +43,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: nightly
+          tag_name: nightly
           body: From ${{ github.sha }}
-          draft: true
+          prerelease: true
           fail_on_unmatched_files: true
           files: ghbuild/linsnled-protocol.pdf
