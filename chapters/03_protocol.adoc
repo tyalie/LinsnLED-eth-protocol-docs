@@ -116,21 +116,25 @@ receivers for which this does not hold.
 === The LinsnLED header
 
 The header format is the same for both EtherTypes. It is always 32 bytes long
-and can be described according to <<fig-header>>. Numbers are parsed as low
+and can be described according to <<fig-header>>. Numbers are parsed as little
 endian if not mentioned otherwise.
 
 [[fig-header]]
-.General LinsnLED Header. The fields explicitly mentioned here are always to be found
+.General LinsnLED Header. The fields explicitly mentioned here are always to be found. Semantic of highlighted part is unknown.
 [bytefield]
 ----
 (draw-column-headers)
 (draw-box "Package ID" {:span 4})
-(draw-related-boxes (repeat 4 0))
+(draw-related-boxes (repeat 4 0) {:fill "#edc4ee"})
 (draw-box "Cmd" {:span 1})
 (draw-box nil [{:span 7} :box-above])
 (draw-box "Command data (22 bytes)" [{:span 15} :box-below])
 (draw-box "Chks")
 ----
+
+CAUTION: *TODO* As can be seen in <<fig-header>> the semantics for bytes 4 to 7
+are currently not known. So far only zeros bytes have been observed, but there
+could be a deeper meaning.
 
 ==== Fields
 [[header-field-pkgid]]
