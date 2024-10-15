@@ -24,4 +24,4 @@ include::{chapdir}/01_introduction.adoc[]
 
 include::{chapdir}/02_hardware.adoc[]
 
-include::{chapdir}/03_overview.adoc[]
+include::{chapdir}/03_protocol.adoc[]
