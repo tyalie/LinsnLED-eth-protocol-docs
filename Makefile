@@ -1,9 +1,13 @@
 docs := $(wildcard *.adoc)
 pdfs := $(docs:.adoc=.pdf)
 htmls := $(docs:.adoc=.html)
-options := -r asciidoctor-diagram -a imagesdir=resources/images
-options-pdf := -r asciidoctor-mathematical -a mathematical-format=svg -a pdf-themesdir=resources/themes -a pdf-fontsdir=resources/fonts -a pdf-theme=my-theme.yml -a pdf-page-size=A4
-options-html :=
+options := -r asciidoctor-diagram
+options-pdf := -a imagesdir=resources/images-pdf \
+	-r asciidoctor-mathematical -a mathematical-format=svg \
+	-a pdf-themesdir=resources/themes -a pdf-theme=my-theme.yml \
+	-a pdf-fontsdir=resources/fonts \
+	-a pdf-page-size=A4
+options-html := -a imagesdir=resources/images-html
 all: html pdf
 pdf: $(pdfs)
 html: $(htmls)
