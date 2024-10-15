@@ -34,9 +34,9 @@ archive driving compatible panels with full rgb and 30fps.
 that later.
 |===
 
-And these are just the projects by big organizations or that are often
-recommended. Just searching for the term "LED Matrix" on GitHub.com presents us
-with 6.7k results, so the general interest is quite high.
+And these are just the most of recommended projects Just searching for the term
+"LED Matrix" on GitHub.com presents us with 6.7k results, so the general
+interest is quite high.
 
 But almost all open source projects do not take full advantage of the
 (honestly) dumb piece of PCB they control. Due to the fact, that every driving
@@ -91,5 +91,3 @@ unanswered.
 The hardware of our receiver module was documented by chubby, although there
 seem to be multiple revisions of the same module out there. Ours does not have a
 separate RAM module on board and uses a different FPGA.{fn-chubby75-rv908}
-
-

@@ -57,9 +57,9 @@ data stored there before exploring the hardware.
 
 Our board uses a Chinese produced 1000BASE-T Ethernet chip called Maxio
 MAE0621B{fn-mae0621b}. Contrary to statements made by Linsn, the chip supports
-MDI-X, meaning that no Ethernet crossover cable is required. It is otherwise a
-fairly normal 1000BASE-T Ethernet chip, that supports most common features one
-would expect.
+auto MDI-X, meaning that no Ethernet crossover cable is required. It is
+otherwise a fairly normal 1000BASE-T Ethernet chip, that supports most common
+features one would expect.
 
 === FPGA
 
