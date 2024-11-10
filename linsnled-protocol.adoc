@@ -11,6 +11,7 @@ Sophie Tyalie <dev@flowerpot.me>
 :toc:
 :toclevels: 5
 :stem: latexmath
+:source-highlighter: rouge
 
 [%notitle]
 == Preface
