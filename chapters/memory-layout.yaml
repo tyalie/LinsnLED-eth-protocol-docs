@@ -1,0 +1,332 @@
+fields:
+  - address: 0x501
+    name: "Cascade Direction"
+    shortname: "CasD"
+    length: 1
+    description: |
+      CAUTION: *TODO* It does something, but it is hard to put into words what
+
+      [[cascade-direction-value-table]]
+      .Possible values for cascade direction
+      [%autowidth, align=center, cols="^1,5"]
+      |===
+      |Value|Meaning
+
+      |`0x20`|From right to left
+      |`0x60`|From left to right
+      |`0xA0`|From bottom to top
+      |`0xE0`|From top to bottom
+      |===
+
+      As you can see from <<cascade-direction-value-table>>, this value
+      might also just be a 3bit value. Unsure if this field is actually 8bit long.
+
+  - address: 0x508
+    name: "Duty Cycle"
+    shortname: "DuCy"
+    length: 1
+    description: |
+      Although the exact meaning is unclear, it is known how the value is derived.
+      In it's simplified form it's the duty ratio times the scan clock frequency.
+
+      Assuming stem:[D_R] the duty ratio (in percent), stem:[S] the value of the scan clock lookup,
+      then the duty cycle (stem:[D_C \in \[1, S) \subset \mathbb{N}]) can be expressed as:
+
+      [stem]
+      ++++
+      D_C = D_R \cdot (S + 1) / 100
+      ++++
+
+  - address: 0x509
+    name: "Scan Clock Lookup"
+    shortname: "ScCl"
+    length: 1
+    description: |
+      In the original LedSet application, this value is derived from a lookup table using the
+      selected scan clock in MHz as an index. The mapping can be found in <<scan-clock-map-table>>.
+      Except for the outlier in 0.6MHz, this table is an inverse exponential curve.
+
+      WARNING: *TODO* This is only applicable for some chips, others use a different lookup table
+
+      [[scan-clock-map-table]]
+      .Scan Clock Lookup Table from MHz to real value
+      [%autowidth, align=center, cols=">3,^3,>3,^3,>3,^3,>3,^3"]
+      |===
+      |Value|Raw Value| Value|Raw Value| Value|Raw Value| Value|Raw Value
+
+      |30.0 MHz | `0x04` |12.5 MHz | `0x0b` | 6.5 MHz | `0x16` | 3.0 MHz | `0x31`
+      |25.0 MHz | `0x05` |11.5 MHz | `0x0c` | 6.0 MHz | `0x18` | 2.5 MHz | `0x3b`
+      |21.4 MHz | `0x06` |10.7 MHz | `0x0d` | 5.6 MHz | `0x1a` | 2.0 MHz | `0x4a`
+      |18.8 MHz | `0x07` |10.0 MHz | `0x0e` | 5.0 MHz | `0x1d` | 1.5 MHz | `0x77`
+      |16.7 MHz | `0x08` | 9.4 MHz | `0x0f` | 4.5 MHz | `0x20` | 1.0 MHz | `0xef`
+      |15.0 MHz | `0x09` | 8.3 MHz | `0x11` | 4.0 MHz | `0x25` | 0.6 MHz | `0x02`
+      |13.6 MHz | `0x0a` | 7.5 MHz | `0x13` | 3.5 MHz | `0x2a` | |
+      |===
+
+  - address: 0x512
+    name: "Drive IC"
+    shortname: "DIC"
+    length: 1
+    description: |
+      This declares the chipset the attached led matrix employes. It is a simple lookup-table
+      with 180 entries (see <<drive-ic-table>>).
+
+      [[drive-ic-table]]
+      .The drive ic and their mapped values
+      [align=center, cols=">2,^1,>2,^1,>2,^1,>2,^1,>2,^1"]
+      |===
+      |Name|Value|Name|Value|Name|Value|Name|Value|Name|Value
+
+      |General  |0	|LXY28161/165  |1	|LXY28163  |2	|LXY28380  |3	|LXY28169  |4
+      |MBI5034  |5	|MBI5031  |6	|MBI5030  |7	|MBI5036  |8	|MBI5039  |9
+      |MBI5042  |10	|MBI5050  |11	|DM13H  |12	|TC62D722  |13	|MBI5224  |14
+      |MBI5051  |15	|MBI5052  |16	|MBI5053  |17	|MY9266  |18	|MY9268  |19
+      |MY9269  |20	|MBI5045  |21	|MBI5041B  |22	|MBI5151  |23	|MBI5152  |24
+      |MBI5153  |25	|SUM2030  |26	|SUM2032  |27	|SUM2017  |28	|MY9221  |29
+      |MY9231  |30	|SUM2019  |31	|MY9366  |32	|MBI5124  |33	|MBI5124DPWM  |34
+      |MY9868  |35	|MY9862  |36	|MBI5166  |37	|SM16136  |38	|SM16158  |39
+      |SUM2028  |40	|MBI5043  |43	|MBI5155  |44	|ICN2027  |45	|SM16159  |46
+      |DM6902  |47	|SUM2017T  |48	|SUM2033  |49	|SM16017S  |51	|MBI5353  |52
+      |LXY345General  |56	|LXY345+LXY163  |57	|LXY345+LXY166  |58	|LXY345+LXY380  |59	|ICN2038S/2045  |61
+      |ICN2038S_T/2045_T  |62	|ICN2053/2050/2153  |63	|MBI5252  |64	|SUM2130  |65	|ICN2038  |66
+      |SM16207S  |67	|ICN2037  |68	|WS2812  |69	|GW6205  |70	|UCS8903  |71
+      |UCS9812  |72	|UCS1903b  |73	|XT1511  |74	|MBI5051B  |75	|SM16237S  |77
+      |ICN2058  |78	|ICND2055  |79	|FM6182  |80	|MY9373  |81	|SM16259  |82
+      |ICN2028  |83	|SM16227S  |84	|FM6153  |85	|FM6124  |86	|SM16237DS  |87
+      |ICND2065  |88	|MY9866  |89	|FM6126C  |90	|SUM2035  |91	|SUM2117  |92
+      |SUM2017TD  |93	|ICND2110  |94	|SM16188B  |95	|ICND2046/ICND2049  |96	|MY9866_T  |97
+      |SM16359  |98	|RT6848  |99	|ICND2112  |100	|ICND2200  |101	|CF6512  |102
+      |ICND2163  |103	|SUM6082  |104	|MBI5253  |105	|MBI5359  |106	|LS9917  |107
+      |LS9920  |108	|SK6812  |109	|SK9816  |110	|MBI5325D  |111	|MBI5325D_DPWM  |112
+      |MBI5325S  |113	|MBI5325S_DPWM  |114	|MBI5850  |115	|MBI5759  |116	|ICND2047  |117
+      |SM16169S  |118	|FM6127  |119	|MY9553  |120	|SM16218  |121	|HBS1923  |122
+      |FM6353  |123	|FM6356  |124	|HBS1910  |125	|FM6555  |126	|MBI6023  |127
+      |RT5965  |128	|YY6018  |129	|UCS5603  |130	|FM6565  |131	|FM6363  |132
+      |ICND2076  |133	|MY9235  |134	|MBI5251  |135	|SM16369S  |136	|DP5525  |137
+      |AXS6018  |138	|HX8055  |139	|MY9748  |140	|CS2033  |141	|ICND2159  |142
+      |RT5966  |143	|SK9810  |144	|WS2816B  |145	|FM6047  |146	|RT5967  |147
+      |CNS7153  |148	|TX1816Z  |149	|HX8864  |151	|CS2017  |152	|DP3264  |153
+      |MBI5264  |154	|ICND2210  |155	|DP3246  |156	|MTS01  |157	|D2618  |158
+      |SM16380  |159	|SM16389  |160	|TX1816ZC  |161	|RT7920  |162	|FM6129  |163
+      |MBI5268  |164	|MBI5254  |165	|SM16388  |166	|SUM6086  |167	|RT5938  |168
+      |MBI5850B  |169	|TM1905  |170	|CFD455A  |171	|ICND2069  |172	|CFD135A  |173
+      |DP3265  |174	|ICND2263  |175	|ICND1063  |176	|LS9918  |200	|LS9929  |204
+      |LS9930  |205	|LS9919  |206	|LS9935  |207	|LS9926  |208	|LS9935B  |209
+      |LS9928  |210	|LS9936  |211	|LS9931  |212	|LS9929C  |213	|LS9933  |222
+      |===
+
+  - address: 0x518
+    name: "? & Image Control"
+    shortname: "ImCn"
+    length: 1
+    description: |
+      This is a 4 bit value. The lower part is the so called image control, the upper is unknown.
+
+      Image control describes what should be displayed, if no new frame data arrived.
+      See <<image-control-table>> for what each value means.
+
+      [[image-control-table]]
+      .Image Control values
+      [%autowidth, align=center, cols="^1,1,1"]
+      |===
+      |Value|LedSet Name|Description
+
+      |0|Black|Display is turned off
+      |1|Random|Freezes the last frame
+      |2|Image|Displays a preset image
+      |3|Auto Test|Executes an automatic test sequence which can be configured.
+      |===
+
+      WARNING: *TODO* It is currently unknown, how Random and Auto Test are configured. Especially
+        the image modus wasn't successfully tested so far.
+
+  - address: 0x560
+    name: "Unknown 1"
+    length: 32
+    description: |
+      It is currently unknown what it means. It seems to be a 16bit integer array (16 values),
+      which depends on our row blanking time.
+
+  - address: 0x6a0
+    length: 32
+    ref: "data-exch-I"
+    name: "Data Exchange (part I)"
+    description: |
+      This configures the order of each image data segment in relation to the final output. It
+      is a mapping with 8 bit values, where the key is the position in the array.
+
+      A data segment here is a display subsection, that is covered by a single scan line. So for a
+      64px high 32S display, there would be two data segments.
+
+      This configures only the first 32 data segments, the array is continued in <<data-exch-II>> for
+      the remaining 96 possible configurable segments.
+
+  - address: 0x11A0
+    length: 96
+    ref: "data-exch-II"
+    name: "Data Exchange (part II)"
+    description: |
+      See <<data-exch-I>> for more details.
+
+  - address: 0x709
+    length: 1
+    ref: "afterglow-lower"
+    name: "Afterglow time (lower byte)"
+    shortname: "AfT-"
+    description: |
+      The afterglow time. Unit is unknown. This value is split into a lower and upper byte,
+      which are at different positions. See <<afterglow-upper>>, for the upper byte.
+
+  - address: 0x764
+    length: 1
+    ref: "afterglow-upper"
+    name: "Afterglow time (upper byte)"
+    shortname: "AfT+"
+    description: |
+      Upper byte of afterglow time. See <<afterglow-lower>> for more information.
+
+  - address: 0x760
+    length: 2
+    name: "Newline Time"
+    shortname: "Newline"
+    order: "LE"
+    description: |
+      The unit is unknown. Limit seems to be afterglow - 1.
+
+  - address: 0x762
+    length: 2
+    name: "Max afterglow time"
+    shortname: "MaxAfT"
+    order: "LE"
+    description: |
+      This value represents the maximum possible afterglow time. It (stem:[M_A \in \mathbb{N}])
+      is derived from the (actual) row blank time (stem:[T_R]) using the formula:
+
+      [stem]
+      ++++
+      M_A = T_R \cdot 100 / 667
+      ++++
+
+  - address: 0x1002
+    length: 2
+    order: "LE"
+    name: "Start X"
+    description: |
+      Starting X coordinate of the subimage the receiver displays. The controller always sends a
+      large continous frame, from which each receiver extracts their own subimage.
+
+  - address: 0x1004
+    length: 2
+    order: "LE"
+    name: "Start Y"
+    description: |
+      Starting Y coordinate of the subimage the receiver displays. The controller always sends a
+      large continous frame, from which each receiver extracts their own subimage.
+
+  - address: 0x1006
+    length: 2
+    order: "LE"
+    name: "Width"
+    description: |
+      The display width, as configured in the UI.
+
+  - address: 0x1008
+    length: 2
+    order: "LE"
+    name: "Height"
+    description: |
+      The display height, as configured in the UI.
+
+  - address: 0x227f
+    length: 1
+    name: "Card Mode"
+    shortname: "CaMo"
+    description: |
+      This is relevant for the data exchange (see <<data-exch-I>>), as it essentially configures
+      how many data segments exist (aka the length of the array). It is a simple lookup value
+      (see <<card-mode-table>>)
+
+      [[card-mode-table]]
+      .Card mode values and their meaning
+      [%autowidth, cols="^1,1"]
+      |===
+      |Value | Description
+
+      |`0`| Normal (16 segments)
+      |`1`| 16 segments for RV907
+      |`2`| 20 segments
+      |`3`| 20 segments for RV907
+      |`4`| 24 segments
+      |`5`| 24 segments for RV905
+      |`6`| 28 segments
+      |`7`| 32 segments
+      |`8`| 16 serial segments for RV907
+      |`9`| 32 serial segments
+      |`10`| 64 serial segments
+      |`11`| 128 serial segments
+      |===
+
+  - address: 0x3003
+    length: 512
+    name: "RCG file path"
+    description: |
+      This is the file path of the RCG file. It is simply a 8 bit char c-string. I'm really
+      unsure why it must be a constant in our RCG file but here we are. This value is displayed
+      in the UI, so we can display fun things with it at least.
+
+      Exact length is unknown, but it is not more than 512 bytes.
+
+  - address: 0x3207
+    length: 2
+    order: "LE"
+    ref: "max-width"
+    name: "Max width"
+    description: |
+      The maximum width that the receiver supports using the current configuration. This could be
+      derived from other values in the RCG, but as that would be quite complicated (and currently
+      unknown how one would do that), it's easier to just read this value instead.
+
+      Is zero, if width is a free parameter without restrictions.
+
+  - address: 0x3209
+    length: 2
+    order: "LE"
+    name: "Max height"
+    shortname: "MaxHeight"
+    description: |
+      The maximum height the receiver supports using the current configuration. If zero, the height
+      is a free parameter. See <<max-width>> for more details.
+
+  - address: 0x320b
+    length: 2
+    order: "LE"
+    name: "Duty ratio"
+    shortname: "DuRa"
+    description: |
+      The duty ratio in percent.
+
+  - address: 0x320d
+    length: 2
+    order: "LE"
+    name: "Row blanking time"
+    shortname: "RoBT"
+    description: |
+      The actual row blanking time as shown in the UI. This value is only set, when the value behind it
+      is larger than 50 by LedSet (unsure why).
+
+  - address: 0x341F
+    length: 4
+    order: "LE"
+    name: "Checksum"
+    shortname: "Chk"
+    description: |
+      The 4 byte file checksum for everything that happened before this point. This value is only
+      generated when the RCG is saved to disk and is verified during loading.
+
+      It can be calculated using the following python function:
+
+      [source, python]
+      ----
+      def checksum(file: bytes) -> int:
+        return sum(file[0:0x341F])  # in python this excludes 0x341F
+      ----

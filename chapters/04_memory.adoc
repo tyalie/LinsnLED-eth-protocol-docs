@@ -3,6 +3,12 @@
 Configuration of receiver cards happens by writing to their (volatile /
 non-volatile) memory directly. For the LinsnLED protocol the semantic of a
 specific address doesn't change (no position independent configuration), which
-eased our RE effort and writing it. This chapter defines the memory map, for the
-configuration protocol description to change these values see
-<<cmd-configuration>>.
+eased our RE effort. This chapter defines the memory map. On how to change these
+values and write them to the receiver cards see <<cmd-configuration>>.
+
+CAUTION: *TODO* Note that not a lot of fields are known so far, there's a
+lot going on in the memory, but only a (small) subset has been understood so
+far.
+
+include::./chapters/memory-layout.yaml[]
+
