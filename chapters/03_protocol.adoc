@@ -294,18 +294,109 @@ The remainder segment seems to be irrelevant in this case.
 
 CAUTION: *TODO* Unknown what the packet ID field does in this case.
 
+
 [[cmd-configuration]]
 === Configuring the system
 
-This requires the command field in the header to be `0x61`.
+This requires the command field in the header to be `0x61`. In stark contrast to
+the rest of the protocol, the (sub-)protocol described here is **stateful**.
 
-CAUTION: This section is currently under heavy construction as it is one of the
-more complex to RE and extensive elements of the protocol.
+This sub-protocol presumably stands out so much from the rest, because it is
+also spoken with the controller card (the element normally between the receiver
+and user agent) in a slightly adapted form. In these cases it is a serial
+protocol, which could explain a few of the design choices they have taken here.
+
+.System configuration packet header. The highlighted part is further detailed in <<cmd-conf-info-bytefield>>
+[bytefield]
+----
+(draw-column-headers)
+(draw-box "Package ID" {:span 4})
+(draw-related-boxes (repeat 4 0))
+(draw-box 0x61)
+(draw-box "Panel IDX" {:span 2})
+(draw-box "Info" {:fill "#edc4ee"})
+(draw-box "Address" {:span 3})
+(draw-box "..." {:span 1})
+(draw-box "Data" {:span 15})
+(draw-box "Chks")
+----
+
+[[cmd-conf-info-bytefield]]
+.The structure of the info byte
+[bytefield]
+----
+(def boxes-per-row 8)
+(def box-width 80)
+(def left-margin 1)
+(draw-column-headers {:labels (reverse (take 8 column-labels))})
+(draw-box "Type" {:span 4})
+(draw-box "is_data?")
+(draw-box "Config Pkg ID" {:span 3})
+----
+
+==== Fields
 
 ===== Panel Index
-This is a 2 byte LE unsigned number, which describes the panel that is being
-addressed during configuration. The value is otherwise 0.
 
-CAUTION: *TODO* I think this wasn't panel, but receiver. Needs to be
-investigated.
+This is a 2 byte LE unsigned number, which address the receiver that will
+process these configuration changes. The value is otherwise 0.
 
+CAUTION: *TODO* How the addressing actually works, needs to be explored further.
+One big point is that the receivers don't have unique static IDs in their own
+right, so how does this work?
+
+===== Type
+
+After trying to understand type as a bit-field for some time and having trouble
+making any sense out of the emerging patterns, we switched to reading it as an
+enum with four values. These describe mostly how the data field will be
+interpreted, and are a big part of the statefulness of the protocol. The values
+are described in <<cmd-conf-type-enum>>.
+
+[[cmd-conf-type-enum]]
+.The enum values of the config command type field
+[%autowidth, align=center, cols="^1,1"]
+|===
+|Value | Description
+
+| `1` | temporary data
+| `5` | state configuration
+| `8` | permanent data
+| `9` | permanent state configurations
+|===
+
+We distinguish between permanent and temporary data, as the configuration can
+also be simply written to RAM instead of SPI, allowing the user to experiment
+with (possible faulty) panel/ receiver configurations before committing to them.
+
+===== is_data?
+
+This field is a simple bit flag, declaring that the data field is actual data,
+and not meta-data how e.g. following packages should be read, …
+
+This value should always be true if and only if `type=1` or `type=9`.
+
+
+===== Config Pkg ID
+
+This field is independent of the carrier package ID.
+
+A single (sub-)package is repeated multiple times (independent of the carrier
+package) before the next one is being sent. This is done presumably to reduce
+the issues stemming from an unreliable carrier. To filter these repeated
+packages, the protocol uses the 3 bit config package ID. For each new package it
+is increased by one, looping after 7.
+
+NOTE: This value is stable between configuration sequences.
+
+===== Address
+
+This is the 3 byte long big-endian address into virtual memory, that the data
+field should be written to (where type is data). In cases where type assumes a
+configuration enum value, this could also be static values, or a restricted
+address.
+
+===== Data
+
+This 16 byte field contains the actual data that contains 16 bytes of the actual
+configuration, further describes the command to be executed or is just gibberish.
