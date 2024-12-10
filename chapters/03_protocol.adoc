@@ -310,7 +310,7 @@ protocol, which could explain a few of the design choices they have taken here.
 [bytefield]
 ----
 (draw-column-headers)
-(draw-box "Package ID" {:span 4})
+(draw-box (text "Package ID" {:fill "#888888"}) {:span 4})
 (draw-related-boxes (repeat 4 0))
 (draw-box 0x61)
 (draw-box "Panel IDX" {:span 2})
@@ -318,11 +318,11 @@ protocol, which could explain a few of the design choices they have taken here.
 (draw-box "Address" {:span 3})
 (draw-box "..." {:span 1})
 (draw-box "Data" {:span 15})
-(draw-box "Chks")
+(draw-box (text "Chks" {:fill "#888888"}))
 ----
 
 [[cmd-conf-info-bytefield]]
-.The structure of the info byte
+.The structure of the info byte (in bits)
 [bytefield]
 ----
 (def boxes-per-row 8)
@@ -338,8 +338,9 @@ protocol, which could explain a few of the design choices they have taken here.
 
 ===== Panel Index
 
-This is a 2 byte LE unsigned number, which address the receiver that will
-process these configuration changes. The value is otherwise 0.
+This is a 2 byte LE unsigned number. It declares the receiver that will process
+this configuration change packet. If this is a general configuration change
+meant for all receivers, this value will be 0.
 
 CAUTION: *TODO* How the addressing actually works, needs to be explored further.
 One big point is that the receivers don't have unique static IDs in their own
@@ -348,13 +349,13 @@ right, so how does this work?
 ===== Type
 
 After trying to understand type as a bit-field for some time and having trouble
-making any sense out of the emerging patterns, we switched to reading it as an
-enum with four values. These describe mostly how the data field will be
-interpreted, and are a big part of the statefulness of the protocol. The values
-are described in <<cmd-conf-type-enum>>.
+making any sense out of the emerging patterns, we shifted to interpreting it as
+a 4 bit integer enum with four defined values. These describe mostly how the
+payload (data field) will be interpreted, and are a big part of the statefulness
+of the protocol. The values are described in <<cmd-conf-type-enum>>.
 
 [[cmd-conf-type-enum]]
-.The enum values of the config command type field
+.The enum values for the config command type field
 [%autowidth, align=center, cols="^1,1"]
 |===
 |Value | Description
@@ -362,41 +363,52 @@ are described in <<cmd-conf-type-enum>>.
 | `1` | temporary data
 | `5` | state configuration
 | `8` | permanent data
-| `9` | permanent state configurations
+| `9` | permanent operation
 |===
 
 We distinguish between permanent and temporary data, as the configuration can
-also be simply written to RAM instead of SPI, allowing the user to experiment
-with (possible faulty) panel/ receiver configurations before committing to them.
+also be simply written to RAM instead of SPI. In the UI this allows the user to
+experiment with different configurations without overwriting a known good
+setting.
+
+The permanent operation are actions that can be executed on the non-volatile
+storage. Only block erase is known so far.
 
 ===== is_data?
 
-This field is a simple bit flag, declaring that the data field is actual data,
-and not meta-data how e.g. following packages should be read, …
+This field is a simple bit flag, declaring that the payload is actual data and
+not meta-data which would describe how the following packets should be
+interpreted and used.
 
-This value should always be true if and only if `type=1` or `type=9`.
-
+This value is true if and only if `type=1` or `type=9`.
 
 ===== Config Pkg ID
 
-This field is independent of the carrier package ID.
+This field is independent of the carrier packet ID.
 
-A single (sub-)package is repeated multiple times (independent of the carrier
-package) before the next one is being sent. This is done presumably to reduce
-the issues stemming from an unreliable carrier. To filter these repeated
-packages, the protocol uses the 3 bit config package ID. For each new package it
-is increased by one, looping after 7.
+A single (sub-)packet is repeated multiple times (independent of the carrier
+packet) before the next one is being sent. This might be a mitigation against
+possible packet loss, as there are no ACK mechanisms in the protocol.
+
+To filter these repeated packets, the protocol uses the 3 bit config packet ID.
+For each new unique packet this value is increased by one and looping back to 0
+after reaching 7.
 
 NOTE: This value is stable between configuration sequences.
 
 ===== Address
 
-This is the 3 byte long big-endian address into virtual memory, that the data
-field should be written to (where type is data). In cases where type assumes a
-configuration enum value, this could also be static values, or a restricted
-address.
+This is a 3 byte long big-endian integer. The integer specifies the data segment
+in (virtual) memory the payload should be applied to. In cases where the type
+enum assumes a configuration value (`type=5` or `type=9`), the address could
+also be a static value or an address with specific limitations (e.g. must be a
+multiple of 4096).
 
+[[cmd-conf-data-field]]
 ===== Data
 
-This 16 byte field contains the actual data that contains 16 bytes of the actual
-configuration, further describes the command to be executed or is just gibberish.
+This 16 byte field or raw data contains can be one of the following:
+
+- configuration data
+- further describes the command to be executed
+- static values (assumed to be gibberish and non-important)
