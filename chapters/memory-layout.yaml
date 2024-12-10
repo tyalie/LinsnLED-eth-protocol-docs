@@ -237,6 +237,45 @@ fields:
     description: |
       The display height, as configured in the UI.
 
+  - address: 0x2000
+    length: 0x200
+    ref: "gamma-curve"
+    name: "Gamma Curve (1st channel)"
+    description: |
+      Gamma curve for the first color channel. This is 256 element long list
+      of LE 16 bit values that describe the gamma curve mapping. The index of
+      an element maps to the specific color value (starting at 0).
+
+  - address: 0x2208
+    length: 4
+    name: "Global Brightness"
+    shortname: "GoBr"
+    description: |
+      This is a four element list, with each element describing the brightness
+      (from 0 to 255) for a single channel. 255 is full brightness.
+
+      We are unsure what color the fourth channel is, especially as it isn't exposed
+      by the UI, but it might be a way to future proof the system or for some esoteric
+      four color LED matrix Linsn once supported.
+
+  - address: 0x2800
+    length: 0x200
+    name: "Gamma Curve (2nd channel)"
+    description: |
+      See <<gamma-curve>> for more info.
+
+  - address: 0x2A00
+    length: 0x200
+    name: "Gamma Curve (3rd channel)"
+    description: |
+      See <<gamma-curve>> for more info.
+
+  - address: 0x2C00
+    length: 0x200
+    name: "Gamma Curve (4th channel)"
+    description: |
+      See <<gamma-curve>> for more info.
+
   - address: 0x227f
     length: 1
     name: "Card Mode"
