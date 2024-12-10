@@ -60,9 +60,9 @@ class MemoryLayoutGen < Asciidoctor::Extensions::IncludeProcessor
 
 
         if remainder > 0
-          table_rows += "\n| %06x %d+<|..." % [align(prev.end), remainder]
+          table_rows += "\n| %06x %d+<|..." % [align(prev.end - remainder), remainder]
         end
-        prev = (align(prev.end)..align(prev.end) + remainder)
+        prev = (align(prev.end - remainder)..align(prev.end - remainder) + remainder)
         remainder = nil
         debug "Run through remainder (end: %x)" % [prev.end]
       end
