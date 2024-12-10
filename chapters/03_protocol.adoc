@@ -460,3 +460,36 @@ volOp --> [*] : type=5\nis_data=F\ndata[0]=0\naddr=""AA:55:AA""
 permOp --> [*] : type=5\nis_data=F\ndata[0]=0\naddr=""AA:55:AA""
 @enduml
 ----
+
+
+==== Possible Payload values
+
+In <<cmd-conf-data-field>> multiple payload types were mentioned, without going
+into much detail which values they could take exactly. <<cmd-conf-state-mach>>
+partially mentions possible data field values, but for the sake of brevity only
+the most relevant parts are shown. This section should clear that up a bit.
+
+The possible values the data field assumes can be categorized using the type
+field.
+
+===== Temporary/Permanent Data (`type=1` or `type=8`)
+
+The data field here is exactly what will be written into memory. It's 16 bytes
+of data that will be written into flash or RAM starting from the location
+specified in the address field.
+
+===== State Configuration (`type=5`)
+
+Here the first byte of the data field is relevant, the remaining 15 bytes are
+filled with the value 0xd8. Depending on whether this is a volatile, permanent
+start of transition or end of transition, the first byte is 0x55, 0x99 or 0x00
+accordingly.
+
+===== Permanent Operation (`type=9`)
+
+In this case the address field shall be a multiple of 4 KiB (0x1000 bytes). The
+first two bytes of the data field are interesting, the remaining 14 bytes are
+filled with 0x8d.
+
+Currently, only one command is known, which is the erase function. In this case
+the first two bytes will assume the value `00:00`.
