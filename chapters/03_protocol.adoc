@@ -412,3 +412,51 @@ This 16 byte field or raw data contains can be one of the following:
 - configuration data
 - further describes the command to be executed
 - static values (assumed to be gibberish and non-important)
+
+
+[[cmd-conf-state-mach]]
+==== State machine
+
+<<cmd-conf-state-dia>> shows the state transition diagram for the configuration
+protocol. Next to every transition the conditions for it are declared as fields
+(and their values) that the config packet needs to match. To keep the diagram
+readable only unique packets are considered here (packets with differing config
+pkg id).
+
+The states in the sub-diagrams are meant to be repeated until the end packet is
+transferred, starting from the start state with each new packet. With this a
+large chunk of memory can be written in a single transfer.
+
+[[cmd-conf-state-dia]]
+.State transition diagram for the configuration message protocol
+[plantuml, format=svg]
+----
+@startuml
+hide empty description
+
+state "volatile operation" as volOp {
+  state "volatile write" as volWrite
+  volWrite: writes ""data"" to ""address""
+  [*] --> volWrite : type=1\nis_data=T
+}
+volOp: Operations acting on RAM
+
+state "permanent operation" as permOp {
+  state "permanent write" as permWrite
+  state "erase" as erase
+
+  erase : Erases 4KiB from flash\nstarting at ""address""
+  permWrite : writes ""data"" to ""address""
+
+  [*] --> permWrite : type=8\nis_data=T
+  [*] --> erase : type=9\nis_data=F\ndata[0:1]=""00:00""
+}
+permOp: Operations acting on flash
+
+[*] --> volOp : type=5\nis_data=F\ndata[0]=0x55\naddr=""AA:55:AA""
+[*] --> permOp : type=5\nis_data=F\ndata[0]=0x99\naddr=""AA:55:AA""
+
+volOp --> [*] : type=5\nis_data=F\ndata[0]=0\naddr=""AA:55:AA""
+permOp --> [*] : type=5\nis_data=F\ndata[0]=0\naddr=""AA:55:AA""
+@enduml
+----
